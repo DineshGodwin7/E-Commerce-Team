@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ShopEase - Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .cart-container {
+            max-width: 900px;
+            margin: 50px auto;
+            flex-grow: 1; /* Push footer down */
+        }
+        footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .product-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar with Toggle for Small Screens -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+            <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" height="40" class="me-2">
+            <span class="text-white">ShopEase</span>
+        </a>
+
+        <!-- Toggle Button for Small Screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links (Collapsible on Small Screens) -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="Shop.html">Shop</a></li>
+                <li class="nav-item"><a class="nav-link" href="Contact.html">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="Cart.html">🛒 Cart</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Cart Section -->
+<div class="container cart-container">
+    <h2 class="text-center mb-4">Your Shopping Cart</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Product</th>
+                <th>Image</th>
+                <th>Price (₹)</th>
+                <th>Quantity</th>
+                <th>Total (₹)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="cartTableBody">
+            <!-- Items will be dynamically populated here -->
+        </tbody>
+    </table>
+    <div class="text-end">
+        <h4>Total Price: ₹<span id="totalPrice">0</span></h4>
+    </div>
+    <div class="text-center mt-3">
+        <button class="btn btn-success" onclick="checkout()">Proceed to Checkout</button>
+        <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
+    </div>
+</div>
+
+<!-- Footer (Sticky at Bottom) -->
+<footer>© 2025 ShopEase - Your Favorite Online Store</footer>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCartDisplay() {
+        const tableBody = document.getElementById('cartTableBody');
+        tableBody.innerHTML = "";
+
+        let total = 0;
+
+        if (cart.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Your cart is empty</td></tr>`;
+        } else {
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${item.title}</td>
+                        <td><img src="${item.image}" class="product-img" alt="${item.title}"></td>
+                        <td>₹${item.price}</td>
+                        <td>
+                            <input type="number" value="${item.quantity}" min="1"
+                                onchange="updateQuantity(${index}, this.value)"
+                                class="form-control form-control-sm" style="width:60px;">
+                        </td>
+                        <td>₹${itemTotal}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Remove</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('totalPrice').innerText = total;
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartDisplay();
+    }
+
+    function updateQuantity(index, newQuantity) {
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        }
+        cart[index].quantity = parseInt(newQuantity);
+        updateCartDisplay();
+    }
+
+    function checkout() {
+        if (cart.length === 0) {
+            alert("Your cart is empty!");
+        } else {
+            alert("Proceeding to checkout! (You can link this to your payment page)");
+        }
+    }
+
+    function clearCart() {
+        if (confirm("Are you sure you want to clear the cart?")) {
+            localStorage.removeItem('cart');
+            cart = [];
+            updateCartDisplay();
+        }
+    }
+
+    window.onload = updateCartDisplay;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
